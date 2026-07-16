@@ -3,6 +3,116 @@ import { MessageSquare, X, Send, Sparkles, Phone, HelpCircle, CornerDownLeft, Ca
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatMessage } from '../types';
 
+const getLocalRuleBasedResponse = (message: string): { text: string; isUrgentDirect?: boolean } => {
+  const msg = message.toLowerCase();
+  
+  // Emergency check
+  if (
+    msg.includes('vomit') || 
+    msg.includes('bleed') || 
+    msg.includes('blood') || 
+    msg.includes('unresponsive') || 
+    msg.includes('seizure') || 
+    msg.includes('breath') || 
+    msg.includes('limp') || 
+    msg.includes('hit') || 
+    msg.includes('poison') || 
+    msg.includes('chocolate') || 
+    msg.includes('chok') ||
+    msg.includes('accident') ||
+    msg.includes('urgent') ||
+    msg.includes('dying')
+  ) {
+    return {
+      text: "This sounds urgent, please call The Barracks Vet Surgery now on (02) 9969 1100 during business hours, or SASH Emergency on (02) 9889 0289 for after hours and emergency care. We recommend getting in touch immediately rather than booking online.",
+      isUrgentDirect: true
+    };
+  }
+
+  // Opening hours
+  if (msg.includes('hour') || msg.includes('open') || msg.includes('close') || msg.includes('time') || msg.includes('sunday') || msg.includes('saturday')) {
+    return {
+      text: "No worries! We are open Monday to Friday from 8:30am to 5:30pm, and Saturdays from 8:00am to 12:30pm. We are closed on Sundays, with consultations conducted by appointment."
+    };
+  }
+
+  // Location / Parking
+  if (msg.includes('located') || msg.includes('where') || msg.includes('address') || msg.includes('parking') || msg.includes('park') || msg.includes('map')) {
+    return {
+      text: "We are located at 2A Best Avenue, Mosman, in the beautiful former army site at Georges Heights (next to Headland Park). We have free, easy parking spots right at our front door, so you won't need to stress about finding a spot!"
+    };
+  }
+
+  // Dog & Cat support
+  if (msg.includes('dog') || msg.includes('cat') || msg.includes('treat') || msg.includes('species') || msg.includes('rat') || msg.includes('guinea') || msg.includes('rabbit')) {
+    return {
+      text: "We absolutely treat dogs, cats, and small mammals like guinea pigs and fancy rats! Dogs are weighed at reception on arrival, and we have a separate cat consultation room infused with calming Feliway pheromones so your cat can settle down peacefully."
+    };
+  }
+
+  // Book appointment / Calendly
+  if (msg.includes('book') || msg.includes('appointment') || msg.includes('schedule') || msg.includes('intake') || msg.includes('calendly') || msg.includes('register')) {
+    return {
+      text: "G'day! You can book an appointment instantly via our Calendly scheduling link (https://calendly.com/pawsy1432/brunswick-veterinary-clinic) or complete our New Patient Registration Form on this page. You can also give us a ring on (02) 9969 1100 to lock in a spot!"
+    };
+  }
+
+  // Emergency query
+  if (msg.includes('emergency') || msg.includes('after hour') || msg.includes('sash') || msg.includes('outside')) {
+    return {
+      text: "For any after-hours emergencies, please contact SASH (Sydney Animal Specialists Hospital) directly on (02) 9889 0289. During opening hours, please call us immediately on (02) 9969 1100.",
+      isUrgentDirect: true
+    };
+  }
+
+  // Vaccinations
+  if (msg.includes('vaccin') || msg.includes('shot') || msg.includes('booster') || msg.includes('puppy') || msg.includes('kitten')) {
+    return {
+      text: "Yes, we offer full vaccination programs for puppies, kittens, adult booster cycles, and senior cats and dogs. Dr James Ross conducts a full checkup during every vaccination check to make sure your pet is in top shape."
+    };
+  }
+
+  // First visit Checklist
+  if (msg.includes('bring') || msg.includes('first visit') || msg.includes('checklist')) {
+    return {
+      text: "For your pet's first visit, please bring any previous vaccination cards or medical history you have. On arrival, dogs will be weighed at reception, and cats will head straight into our dedicated cat consult room."
+    };
+  }
+
+  // Dental Care
+  if (msg.includes('dental') || msg.includes('teeth') || msg.includes('tooth') || msg.includes('dentist') || msg.includes('scaling')) {
+    return {
+      text: "We offer comprehensive dental care, including professional ultrasonic scaling, teeth polishing, and surgical extractions on site. Dr James can also advise on premium diet options and dental home care routines."
+    };
+  }
+
+  // Surgical procedures
+  if (msg.includes('surg') || msg.includes('operat') || msg.includes('de-sex') || msg.includes('desex') || msg.includes('tumor') || msg.includes('orthopaed')) {
+    return {
+      text: "Dr James Ross performs soft tissue surgeries (such as de-sexing, tumor removals, abdominal surgeries) and basic orthopaedic procedures in our sterile surgical suite. All surgical cases receive tailored pain relief and dedicated nursing care."
+    };
+  }
+
+  // Digital x-ray
+  if (msg.includes('x-ray') || msg.includes('radiograph') || msg.includes('imaging') || msg.includes('scan')) {
+    return {
+      text: "Yes, we have state-of-the-art digital radiography (x-ray) on site. It provides instant high-resolution diagnostics with reduced waiting times, and we consult with external radiologists free of charge for complex cases."
+    };
+  }
+
+  // Price / Cost
+  if (msg.includes('cost') || msg.includes('price') || msg.includes('fee') || msg.includes('dollar') || msg.includes('expensive')) {
+    return {
+      text: "The cost of a consultation varies depending on your pet and the reason for your visit. Rather than a flat figure, please call our friendly team on (02) 9969 1100 to discuss what your pet needs so we can give you a clear, honest quote."
+    };
+  }
+
+  // General default friendly response
+  return {
+    text: "G'day! I'm Pawsy, the assistant here at The Barracks Vet Surgery. For bookings, feel free to use our Calendly link (https://calendly.com/pawsy1432/brunswick-veterinary-clinic). For anything medical or urgent, please ring our clinic directly on (02) 9969 1100, or let me know what else I can help with!"
+  };
+};
+
 export default function PawsyChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -75,15 +185,16 @@ export default function PawsyChatWidget() {
         throw new Error('Chat API returned error');
       }
     } catch (error) {
-      console.error('Chat error:', error);
-      // Fallback message in case of failure
-      const errorMsg: ChatMessage = {
-        id: `pawsy_err_${Date.now()}`,
+      // Gracefully fall back to the smart local rule-based engine in static/offline environments (like GitHub Pages)
+      const localResponse = getLocalRuleBasedResponse(textToSend);
+      const pawsyMsg: ChatMessage = {
+        id: `pawsy_local_${Date.now()}`,
         sender: 'pawsy',
-        text: "No worries, but my connection skipped a beat! Please call Dr James Ross directly on (02) 9969 1100 to get instant advice or book an appointment.",
+        text: localResponse.text,
         timestamp: new Date(),
+        isUrgentDirect: localResponse.isUrgentDirect,
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, pawsyMsg]);
     } finally {
       setIsLoading(false);
     }

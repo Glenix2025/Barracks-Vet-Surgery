@@ -22,10 +22,40 @@ export default function App() {
       const response = await fetch('/api/registrations');
       if (response.ok) {
         const data = await response.json();
-        setRegistrations(data.registrations || []);
+        const serverRegs = data.registrations || [];
+        
+        // Sync with local storage
+        const local = localStorage.getItem('barracks_registrations');
+        const localRegs = local ? JSON.parse(local) : [];
+        
+        // Merge and deduplicate
+        const combined = [...serverRegs];
+        localRegs.forEach((lr: any) => {
+          if (!combined.some(sr => sr.id === lr.id)) {
+            combined.push(lr);
+          }
+        });
+        
+        setRegistrations(combined);
+      } else {
+        fallbackToLocal();
       }
     } catch (err) {
-      console.error('Error fetching registrations:', err);
+      // Quietly fall back to localStorage on static/offline hosts (like GitHub Pages) to avoid disruptive errors
+      fallbackToLocal();
+    }
+  };
+
+  const fallbackToLocal = () => {
+    try {
+      const local = localStorage.getItem('barracks_registrations');
+      if (local) {
+        setRegistrations(JSON.parse(local));
+      } else {
+        setRegistrations([]);
+      }
+    } catch (e) {
+      setRegistrations([]);
     }
   };
 

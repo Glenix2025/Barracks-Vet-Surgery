@@ -3,6 +3,10 @@ import { motion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Heart, Star, Sparkles } from 'lucide-react';
 import { PetPatient } from '../types';
 
+const barnabyPhoto = new URL('../assets/images/barnaby_fancy_rat_1784189895986.jpg', import.meta.url).href;
+const teddyPhoto = new URL('../assets/images/teddy_pomeranian_mix_1784190242531.jpg', import.meta.url).href;
+const bellaPhoto = new URL('../assets/images/bella_maltese_dog_1784190259707.jpg', import.meta.url).href;
+
 const HAPPY_PATIENTS: PetPatient[] = [
   {
     id: '1',
@@ -13,7 +17,7 @@ const HAPPY_PATIENTS: PetPatient[] = [
     quote: "Always gets spoiled with extra belly rubs on Dr James' reception scales!",
     imageDesc: 'Fluffy white and tan Pomeranian mix lying cozy on a soft blue towel.',
     imageColor: 'bg-blue-100',
-    imageSrc: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=400'
+    imageSrc: teddyPhoto
   },
   {
     id: '2',
@@ -24,7 +28,7 @@ const HAPPY_PATIENTS: PetPatient[] = [
     quote: 'Wrapped snugly in his favorite blue fleece wrap for a quick dental checkup.',
     imageDesc: 'Cute dark brown rat with bright black eyes poking out from a soft blue towel wrap.',
     imageColor: 'bg-emerald-100',
-    imageSrc: 'https://images.unsplash.com/photo-1551085254-e96b210db58a?auto=format&fit=crop&q=80&w=400'
+    imageSrc: barnabyPhoto
   },
   {
     id: '3',
@@ -35,7 +39,7 @@ const HAPPY_PATIENTS: PetPatient[] = [
     quote: "Paws up on the desk, helping type out vaccine reminder cards with her tongue out!",
     imageDesc: 'Happy Maltese dog leaning up at the clinic computer monitor, panting cheerfully.',
     imageColor: 'bg-amber-100',
-    imageSrc: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=400'
+    imageSrc: bellaPhoto
   },
   {
     id: '4',
