@@ -1,0 +1,6 @@
+{
+  "name": "The Barracks Vet Surgery",
+  "description": "Interactive website and AI assistant Pawsy for The Barracks Vet Surgery, Mosman",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

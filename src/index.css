@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  
+  --color-brand-green: #4A5D4E;
+  --color-brand-green-hover: #38473B;
+  --color-brand-orange: #F27D26;
+  --color-brand-orange-hover: #D9661D;
+  --color-bg-warm: #FCFAF7;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-warm);
+    color: #2D2D2D;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom scrollbar for horizontal wall */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
