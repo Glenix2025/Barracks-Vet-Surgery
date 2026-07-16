@@ -1,153 +1,188 @@
-import { useRef } from 'react';
-import { motion } from 'motion/react';
-import { ChevronLeft, ChevronRight, Heart, Star, Sparkles } from 'lucide-react';
-import { PetPatient } from '../types';
+import { useState, useRef, MouseEvent, FormEvent } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Heart, 
+  MessageCircle, 
+  Send, 
+  Bookmark, 
+  Smile, 
+  Instagram, 
+  Grid, 
+  LayoutList, 
+  Sparkles,
+  CheckCircle2,
+  MoreHorizontal
+} from 'lucide-react';
 
-const barnabyPhoto = new URL('../assets/images/barnaby_fancy_rat_1784189895986.jpg', import.meta.url).href;
-const teddyPhoto = new URL('../assets/images/teddy_pomeranian_mix_1784190242531.jpg', import.meta.url).href;
-const bellaPhoto = new URL('../assets/images/bella_maltese_dog_1784190259707.jpg', import.meta.url).href;
+// Exact image paths from the generated assets and existing files
+const clinicExterior = new URL('../assets/images/clinic_exterior_1784185640077.jpg', import.meta.url).href;
+const charliePhoto = new URL('../assets/images/bella_maltese_dog_1784190259707.jpg', import.meta.url).href;
+const peterPhoto = new URL('../assets/images/peter_dwarf_lop_1784192821696.jpg', import.meta.url).href;
+const jackJillPhoto = new URL('../assets/images/jack_jill_cats_1784192837717.jpg', import.meta.url).href;
+const fluffyPhoto = new URL('../assets/images/fluffy_poodle_1784192849603.jpg', import.meta.url).href;
+const snoozyPhoto = new URL('../assets/images/snoozy_siberian_cat_1784192859823.jpg', import.meta.url).href;
+const louiePhoto = new URL('../assets/images/louie_pekingese_1784192870969.jpg', import.meta.url).href;
+const cavalierPhoto = new URL('../assets/images/cavalier_puppies_1784192881050.jpg', import.meta.url).href;
+const bullmastiffPhoto = new URL('../assets/images/big_betty_bullmastiff_1784192892881.jpg', import.meta.url).href;
 
-const HAPPY_PATIENTS: PetPatient[] = [
+interface InstagramPost {
+  id: string;
+  name: string;
+  breed: string;
+  species: 'dog' | 'cat' | 'other';
+  imageSrc: string;
+  caption: string;
+  likes: number;
+  hasLiked: boolean;
+  relativeTime: string;
+  date: string;
+  comments: {
+    username: string;
+    text: string;
+    verified?: boolean;
+  }[];
+}
+
+const INITIAL_POSTS: InstagramPost[] = [
   {
-    id: '1',
-    name: 'Teddy',
-    species: 'dog',
-    breed: 'Pomeranian Mix',
-    description: 'Beautiful fluffball with striking heterochromia (one blue eye, one brown eye).',
-    quote: "Always gets spoiled with extra belly rubs on Dr James' reception scales!",
-    imageDesc: 'Fluffy white and tan Pomeranian mix lying cozy on a soft blue towel.',
-    imageColor: 'bg-blue-100',
-    imageSrc: teddyPhoto
-  },
-  {
-    id: '2',
-    name: 'Barnaby',
-    species: 'rodent',
-    breed: 'Fancy Rat',
-    description: 'Gentle, curious soul who loves hiding in warm pockets.',
-    quote: 'Wrapped snugly in his favorite blue fleece wrap for a quick dental checkup.',
-    imageDesc: 'Cute dark brown rat with bright black eyes poking out from a soft blue towel wrap.',
-    imageColor: 'bg-emerald-100',
-    imageSrc: barnabyPhoto
-  },
-  {
-    id: '3',
-    name: 'Bella',
-    species: 'dog',
+    id: 'charlie',
+    name: 'Charlie',
     breed: 'Maltese',
-    description: 'Dr James\' assistant-in-training, always checking the computer schedule.',
-    quote: "Paws up on the desk, helping type out vaccine reminder cards with her tongue out!",
-    imageDesc: 'Happy Maltese dog leaning up at the clinic computer monitor, panting cheerfully.',
-    imageColor: 'bg-amber-100',
-    imageSrc: bellaPhoto
-  },
-  {
-    id: '4',
-    name: 'Coco',
     species: 'dog',
-    breed: 'Cavoodle',
-    description: 'Apricot colored sweetheart with big, soulful puppy dog eyes.',
-    quote: 'Came in for her booster vaccination and left with a pocketful of healthy liver treats.',
-    imageDesc: 'Fluffy, curly apricot Cavoodle puppy looking straight into the camera with adorable eyes.',
-    imageColor: 'bg-orange-100',
-    imageSrc: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&q=80&w=400'
+    imageSrc: charliePhoto,
+    caption: 'Little Charlie helping us out at reception today before his dental 🐶 #dental #dogsofinstagram #maltese #cutie',
+    likes: 48,
+    hasLiked: false,
+    relativeTime: '363w',
+    date: 'AUGUST 30, 2019',
+    comments: [
+      { username: 'mosmandaily', text: 'So cute', verified: true }
+    ]
   },
   {
-    id: '5',
-    name: 'Winston',
-    species: 'dog',
-    breed: 'Miniature Schnauzer',
-    description: 'Extremely handsome gentleman with an impeccably groomed beard.',
-    quote: 'Perfect posture on the exam table, resting comfortably on a warm red towel.',
-    imageDesc: 'Salt-and-pepper Miniature Schnauzer lying down calmly on a bright red veterinary blanket.',
-    imageColor: 'bg-red-100',
-    imageSrc: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?auto=format&fit=crop&q=80&w=400'
+    id: 'peter',
+    name: 'Peter',
+    breed: 'Dwarf Lop Bunny',
+    species: 'other',
+    imageSrc: peterPhoto,
+    caption: 'Adorable little Peter the Dwarf Lop bunny in for his desex surgery today. So tiny! 😍😍 #peterrabbit #bunniesofinstagram #surgery #dwarflop',
+    likes: 34,
+    hasLiked: false,
+    relativeTime: '375w',
+    date: 'JUNE 6, 2019',
+    comments: [
+      { username: 'mrslancken', text: '❤️❤️ bunnies' }
+    ]
   },
   {
-    id: '6',
-    name: 'Pip',
-    species: 'rodent',
-    breed: 'Abyssinian Guinea Pig',
-    description: 'Quiet explorer who squeaks loudly when he smells fresh hay.',
-    quote: "Snugly sitting inside a cardboard travel box, ready for his claw trim checkup.",
-    imageDesc: 'Fluffy black, white, and grey guinea pig nestled safely inside a snug cardboard box.',
-    imageColor: 'bg-purple-100',
-    imageSrc: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&q=80&w=400'
-  },
-  {
-    id: '7',
-    name: 'Buster',
-    species: 'dog',
-    breed: 'West Highland Terrier',
-    description: 'Spunky local who loves walking along the Georges Heights trails.',
-    quote: "Stands on his hind legs and 'begs' to show off how strong his knee joints are!",
-    imageDesc: 'Cute white West Highland White Terrier standing upright on hind legs, waving paws playfully.',
-    imageColor: 'bg-indigo-100',
-    imageSrc: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?auto=format&fit=crop&q=80&w=400'
-  },
-  {
-    id: '8',
-    name: 'Oreo',
-    species: 'dog',
-    breed: 'Panda-Dog Mix',
-    description: 'Incredible smile and super soft fur. The ultimate cuddler.',
-    quote: "Refuses to leave the waiting room until he gets to say hi to the cats.",
-    imageDesc: 'A happy black and white mixed-breed dog showing off a massive, joyful grin.',
-    imageColor: 'bg-teal-100',
-    imageSrc: 'https://images.unsplash.com/photo-1537151608828-ea2b117b6281?auto=format&fit=crop&q=80&w=400'
-  },
-  {
-    id: '9',
-    name: 'Milo & Otis',
+    id: 'jack_jill',
+    name: 'Jack & Jill',
+    breed: 'Domestic Tabby Siblings',
     species: 'cat',
-    breed: 'Domestic Tabby Pair',
-    description: 'Inseparable brothers who share everything, including their nap spots.',
-    quote: 'Settling down with Feliway pheromones in the separate cat consult room.',
-    imageDesc: 'Two identical brown tabby cats curled up tightly together in a warm pink round pet bed.',
-    imageColor: 'bg-rose-100',
-    imageSrc: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400'
+    imageSrc: jackJillPhoto,
+    caption: 'Jack & Jill are hoping to find a new home. 10 year old bonded siblings that are incredibly affectionate and love nothing more than cuddles and food! Please call 9969 1100 if you are interested. 😻😻',
+    likes: 52,
+    hasLiked: false,
+    relativeTime: '388w',
+    date: 'MARCH 8, 2019',
+    comments: [
+      { username: 'ko626880', text: 'They are just gorgeous' },
+      { username: 'luce.wat', text: '🥺' }
+    ]
   },
   {
-    id: '10',
-    name: 'Sunny',
+    id: 'fluffy',
+    name: 'Fluffy',
+    breed: 'Poodle Mix',
     species: 'dog',
-    breed: 'Toy Poodle',
-    description: 'Energetic gymnast who can jump high but prefers being carried.',
-    quote: 'Always smiling and stretching her front legs for Dr James to examine her joints.',
-    imageDesc: 'Cute golden-apricot toy poodle standing up and stretching happily during a wellness visit.',
-    imageColor: 'bg-yellow-100',
-    imageSrc: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=400'
+    imageSrc: fluffyPhoto,
+    caption: 'Fluffy! Such a happy girl! #bichonfrise #poodlemix #dental #sweetiepie #happy #vet #teeth #pearlywhites #veryfluffy #treatment #clean',
+    likes: 41,
+    hasLiked: false,
+    relativeTime: '398w',
+    date: 'JANUARY 11, 2019',
+    comments: [
+      { username: 'shopglowsupplyco', text: "hey send us a DM, let's collaborate 🔥" },
+      { username: 'shopglowsupplyco', text: "hey send us a message, let's collab! 🔥" },
+      { username: 'explorewithpup', text: 'Love this post! Please message me so we can talk about sharing it on our page!' }
+    ]
   },
   {
-    id: '11',
-    name: 'Luna',
+    id: 'snoozy',
+    name: 'Snoozy',
+    breed: 'Siberian Forest Cat',
     species: 'cat',
-    breed: 'Longhaired Tabby',
-    description: 'Expressive princess who makes the absolute best silly faces.',
-    quote: "Stuck her pink tongue out in a perfect 'mlem' during her routine ear cleaning.",
-    imageDesc: 'A fluffy longhaired tabby cat with its tongue sticking out in a highly comical expression.',
-    imageColor: 'bg-pink-100',
-    imageSrc: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=400'
+    imageSrc: snoozyPhoto,
+    caption: 'Hmmmm.... anaesthetics 😴💤 #barracksvet #sleepy #yum #siberianforestcat #siberiancat #dental #lionclip #matted #cat #snooze #anaesthesia #anaesthetic',
+    likes: 59,
+    hasLiked: false,
+    relativeTime: '403w',
+    date: 'DECEMBER 7, 2018',
+    comments: [
+      { username: 'chels.randall', text: 'The caption 😂😂' }
+    ]
   },
   {
-    id: '12',
-    name: 'Ziggy',
+    id: 'louie',
+    name: 'Louie',
+    breed: 'Pekingese',
     species: 'dog',
-    breed: 'Border Collie',
-    description: 'Super intelligent athlete. Can read the clinic brochures.',
-    quote: 'Showed off his happy smile, then immediately fell asleep on his soft red blanket.',
-    imageDesc: 'A beautiful border collie with deep, happy expressions resting contentedly on a towel.',
-    imageColor: 'bg-stone-100',
-    imageSrc: 'https://images.unsplash.com/photo-1503256207526-0d5d80fa2f47?auto=format&fit=crop&q=80&w=400'
+    imageSrc: louiePhoto,
+    caption: "Louie just simply can't help looking cute! Just got to get that breath just as cute! 😂 #barracksvet #teddybear #pekingese #dental #stinkybreath #notforlong #stay healthy #dentaldisease #gnashers #sparklyteeth",
+    likes: 63,
+    hasLiked: false,
+    relativeTime: '409w',
+    date: 'OCTOBER 26, 2018',
+    comments: [
+      { username: 'lov_the_mud', text: 'So cute' }
+    ]
+  },
+  {
+    id: 'gabrielle_louis',
+    name: 'Gabrielle & Louis',
+    breed: 'Cavalier Puppies',
+    species: 'dog',
+    imageSrc: cavalierPhoto,
+    caption: 'Then this happened!! 💙🐶🐶💖 8 wk old siblings, Gabrielle & Louis popped in to meet us. #barracksvet #cavalierkingcharlesspaniel #cavalierpuppy #puppies #puppy #brother #sister #siblings',
+    likes: 71,
+    hasLiked: false,
+    relativeTime: '413w',
+    date: 'SEPTEMBER 28, 2018',
+    comments: [
+      { username: 'anncbrockbank', text: 'Oh my goodness, they are simply perfect! 😍' }
+    ]
+  },
+  {
+    id: 'big_betty',
+    name: 'Big Betty',
+    breed: 'Bullmastiff',
+    species: 'dog',
+    imageSrc: bullmastiffPhoto,
+    caption: 'Big Betty found herself a 🛋️ #barracksvet #bullmastiff #loveslaps #thinksshesalapdog',
+    likes: 84,
+    hasLiked: false,
+    relativeTime: '439w',
+    date: 'MARCH 30, 2018',
+    comments: [
+      { username: 'bettybullmastiff', text: 'Oh Betty!' }
+    ]
   }
 ];
 
 export default function HappyPatientsWall() {
+  const [posts, setPosts] = useState<InstagramPost[]>(INITIAL_POSTS);
+  const [viewMode, setViewMode] = useState<'feed' | 'grid'>('feed');
+  const [selectedPost, setSelectedPost] = useState<InstagramPost | null>(null);
+  const [activeCommentTexts, setActiveCommentTexts] = useState<{ [postId: string]: string }>({});
+  const [doubleTapActive, setDoubleTapActive] = useState<{ [postId: string]: boolean }>({});
+  
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -340 : 340;
+      const scrollAmount = direction === 'left' ? -360 : 360;
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
@@ -155,117 +190,490 @@ export default function HappyPatientsWall() {
     }
   };
 
+  const handleLike = (id: string, e?: MouseEvent) => {
+    if (e) e.stopPropagation();
+    setPosts(prev => prev.map(post => {
+      if (post.id === id) {
+        return {
+          ...post,
+          hasLiked: !post.hasLiked,
+          likes: post.hasLiked ? post.likes - 1 : post.likes + 1
+        };
+      }
+      return post;
+    }));
+  };
+
+  const handleDoubleTap = (id: string) => {
+    setDoubleTapActive(prev => ({ ...prev, [id]: true }));
+    setPosts(prev => prev.map(post => {
+      if (post.id === id && !post.hasLiked) {
+        return {
+          ...post,
+          hasLiked: true,
+          likes: post.likes + 1
+        };
+      }
+      return post;
+    }));
+    setTimeout(() => {
+      setDoubleTapActive(prev => ({ ...prev, [id]: false }));
+    }, 1000);
+  };
+
+  const handleCommentSubmit = (postId: string, e: FormEvent) => {
+    e.preventDefault();
+    const text = activeCommentTexts[postId]?.trim();
+    if (!text) return;
+
+    setPosts(prev => prev.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          comments: [...post.comments, { username: 'you', text }]
+        };
+      }
+      return post;
+    }));
+
+    setActiveCommentTexts(prev => ({ ...prev, [postId]: '' }));
+
+    // If modal is open, sync the selected post state as well
+    if (selectedPost && selectedPost.id === postId) {
+      setSelectedPost(prev => prev ? {
+        ...prev,
+        comments: [...prev.comments, { username: 'you', text }]
+      } : null);
+    }
+  };
+
+  // Helper to parse hashtags and color them blue
+  const renderCaption = (text: string) => {
+    const words = text.split(' ');
+    return words.map((word, index) => {
+      if (word.startsWith('#')) {
+        return <span key={index} className="text-[#00376b] font-medium hover:underline cursor-pointer">{word} </span>;
+      }
+      return word + ' ';
+    });
+  };
+
   return (
     <section id="happy-patients" className="py-16 bg-white relative overflow-hidden">
-      {/* Decorative background circle */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-bg-warm rounded-full -mr-48 -mt-24 -z-10 opacity-60" />
+      {/* Visual background decor */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-bg-warm rounded-full -mr-48 -mt-24 -z-10 opacity-50" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-green/5 rounded-full -ml-48 -mb-24 -z-10" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 border-b border-gray-100 pb-8">
           <div>
             <div className="inline-flex items-center gap-2 bg-[#4A5D4E]/10 text-brand-green px-3 py-1 rounded-full text-xs font-bold uppercase mb-3">
-              <Sparkles className="w-3 h-3 text-brand-orange" />
+              <Instagram className="w-3.5 h-3.5 text-brand-orange" />
               Community Spotlight
             </div>
             <h2 className="text-4xl font-display font-bold text-gray-900 tracking-tight">
-              Our Happy <span className="text-brand-green italic font-serif">Patients</span> Wall
+              Happy Patients <span className="text-brand-green italic font-serif">Instagram Wall</span>
             </h2>
-            <p className="text-gray-500 mt-2 max-w-xl text-sm">
-              Real locals who trust Dr James Ross and the team. From energetic trail-runners to cozy cuddlers, we welcome pets of all shapes and sizes!
+            <p className="text-gray-500 mt-2 max-w-xl text-sm leading-relaxed">
+              Straight from our official <a href="https://glenix2025.github.io/Barracks-Vet-Surgery/" target="_blank" rel="noreferrer" className="text-brand-green underline font-medium hover:text-brand-orange">@barracksvet</a> feed! Follow us for cute daily checkups, dental updates, and clinic high-fives.
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => scroll('left')}
-              className="p-3 rounded-full border border-gray-200 hover:border-brand-green hover:bg-bg-warm text-gray-600 hover:text-brand-green transition-colors cursor-pointer shadow-sm"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => scroll('right')}
-              className="p-3 rounded-full border border-gray-200 hover:border-brand-green hover:bg-bg-warm text-gray-600 hover:text-brand-green transition-colors cursor-pointer shadow-sm"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          {/* Controls: View Switcher and Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <div className="flex bg-gray-100 p-1 rounded-xl shadow-inner border border-gray-200">
+              <button
+                onClick={() => setViewMode('feed')}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${viewMode === 'feed' ? 'bg-white text-brand-green shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                <LayoutList className="w-3.5 h-3.5" />
+                Stories Feed
+              </button>
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white text-brand-green shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+                Profile Grid
+              </button>
+            </div>
+
+            {viewMode === 'feed' && (
+              <div className="flex gap-1.5">
+                <button
+                  onClick={() => scroll('left')}
+                  className="p-2.5 rounded-full border border-gray-200 hover:border-brand-green hover:bg-bg-warm text-gray-600 hover:text-brand-green transition-colors cursor-pointer shadow-sm"
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scroll('right')}
+                  className="p-2.5 rounded-full border border-gray-200 hover:border-brand-green hover:bg-bg-warm text-gray-600 hover:text-brand-green transition-colors cursor-pointer shadow-sm"
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Horizontal scroll container */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide no-scrollbar snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {HAPPY_PATIENTS.map((patient) => (
+        {/* --- VIEW MODE 1: HORIZONTAL INSTAGRAM FEED CAROUSEL --- */}
+        {viewMode === 'feed' && (
+          <div className="relative">
             <div
-              key={patient.id}
-              className="min-w-[300px] md:min-w-[320px] max-w-[320px] bg-bg-warm rounded-3xl overflow-hidden border border-gray-100 shadow-sm snap-start hover:shadow-md transition-all duration-300 flex flex-col group"
+              ref={scrollContainerRef}
+              className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide no-scrollbar snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none' }}
             >
-              {/* Pet Image Frame with subtle hover scale */}
-              <div className="h-64 relative overflow-hidden bg-gray-200 shrink-0">
-                <img
-                  src={patient.imageSrc}
-                  alt={patient.imageDesc}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                
-                {/* Species badge */}
-                <span className="absolute top-4 left-4 bg-white/95 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-green shadow-sm flex items-center gap-1.5 uppercase">
-                  {patient.species === 'dog' && '🐶 Dog'}
-                  {patient.species === 'cat' && '🐱 Cat'}
-                  {patient.species === 'rodent' && '🐹 Small Pet'}
-                  {patient.species === 'other' && '🦜 Exotic'}
-                </span>
-
-                {/* Aesthetic bottom overlay */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent p-4 flex items-end justify-between text-white">
-                  <div>
-                    <h3 className="font-display font-bold text-lg leading-tight">{patient.name}</h3>
-                    <p className="text-[11px] opacity-90 font-medium">{patient.breed}</p>
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="min-w-[340px] md:min-w-[360px] max-w-[360px] bg-white rounded-2xl border border-gray-200 shadow-sm snap-start flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-300"
+                >
+                  {/* IG Post Header */}
+                  <div className="flex items-center justify-between p-3 border-b border-gray-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-brand-green/20 bg-gray-100 shrink-0">
+                        <img
+                          src={clinicExterior}
+                          alt="barracksvet profile"
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-xs text-gray-900 leading-tight">barracksvet</span>
+                          <span className="text-[10px] text-gray-400">•</span>
+                          <span className="text-[10px] text-gray-400 font-semibold">{post.relativeTime}</span>
+                        </div>
+                        <span className="text-[10px] text-gray-500 leading-tight">The Barracks Vet Surgery</span>
+                      </div>
+                    </div>
+                    <button className="text-gray-400 hover:text-gray-700">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="bg-brand-orange p-1.5 rounded-full text-white">
-                    <Heart className="w-3.5 h-3.5 fill-current" />
-                  </div>
-                </div>
-              </div>
 
-              {/* Patient Bio Content */}
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <p className="text-xs text-gray-600 leading-relaxed font-sans">
-                    {patient.description}
-                  </p>
-                  <div className="border-t border-brand-green/10 my-3" />
-                  <p className="text-xs text-brand-green font-medium italic relative pl-4">
-                    <span className="absolute left-0 top-0 text-brand-orange font-bold text-base leading-none">“</span>
-                    {patient.quote}
-                  </p>
-                </div>
+                  {/* IG Post Image + Double tap to like mechanism */}
+                  <div 
+                    className="h-[350px] relative overflow-hidden bg-gray-50 select-none cursor-pointer"
+                    onDoubleClick={() => handleDoubleTap(post.id)}
+                  >
+                    <img
+                      src={post.imageSrc}
+                      alt={post.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
 
-                <div className="mt-4 flex items-center justify-between text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                  <span>📍 Mosman local</span>
-                  <div className="flex items-center gap-0.5 text-amber-500">
-                    <Star className="w-3 h-3 fill-current" />
-                    <Star className="w-3 h-3 fill-current" />
-                    <Star className="w-3 h-3 fill-current" />
-                    <Star className="w-3 h-3 fill-current" />
-                    <Star className="w-3 h-3 fill-current" />
+                    {/* Double-tap animated heart overlay */}
+                    <AnimatePresence>
+                      {doubleTapActive[post.id] && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1.2, opacity: 0.9 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        >
+                          <Heart className="w-20 h-20 text-white fill-white drop-shadow-lg" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
+
+                  {/* IG Post Action Bar */}
+                  <div className="p-3 pb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={(e) => handleLike(post.id, e)}
+                        className="text-gray-700 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Heart
+                          className={`w-5 h-5 ${post.hasLiked ? 'text-red-500 fill-red-500' : ''}`}
+                        />
+                      </button>
+                      <button className="text-gray-700 hover:text-gray-900 transition-colors">
+                        <MessageCircle className="w-5 h-5" />
+                      </button>
+                      <button className="text-gray-700 hover:text-gray-900 transition-colors">
+                        <Send className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <button className="text-gray-700 hover:text-gray-900 transition-colors">
+                      <Bookmark className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* IG Likes Count */}
+                  <div className="px-3 pb-1">
+                    <p className="text-xs font-bold text-gray-900">
+                      {post.likes} likes
+                    </p>
+                  </div>
+
+                  {/* IG Caption */}
+                  <div className="px-3 pb-2 flex-1 overflow-y-auto no-scrollbar text-xs">
+                    <p className="leading-relaxed">
+                      <span className="font-bold text-gray-900 mr-1.5">barracksvet</span>
+                      {renderCaption(post.caption)}
+                    </p>
+
+                    {/* Render existing comments */}
+                    <div className="mt-2 space-y-1 bg-gray-50/50 p-2 rounded-lg border border-gray-50">
+                      {post.comments.map((comm, idx) => (
+                        <div key={idx} className="flex items-start gap-1 leading-normal">
+                          <span className="font-bold text-gray-900 shrink-0 flex items-center gap-1">
+                            {comm.username}
+                            {comm.verified && (
+                              <span className="inline-block w-3 h-3 bg-blue-500 text-white rounded-full p-0.5 flex items-center justify-center shrink-0">
+                                <span className="text-[6px] font-bold">✓</span>
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-gray-700">{comm.text}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-[9px] text-gray-400 font-semibold tracking-wider mt-2.5 uppercase">
+                      {post.date}
+                    </p>
+                  </div>
+
+                  {/* Live Comment Form */}
+                  <form
+                    onSubmit={(e) => handleCommentSubmit(post.id, e)}
+                    className="border-t border-gray-100 px-3 py-2.5 flex items-center justify-between gap-2 shrink-0 bg-gray-50/30"
+                  >
+                    <Smile className="w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      value={activeCommentTexts[post.id] || ''}
+                      onChange={(e) => setActiveCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))}
+                      className="text-xs flex-1 border-none focus:outline-none bg-transparent placeholder-gray-400 text-gray-800"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!activeCommentTexts[post.id]?.trim()}
+                      className={`text-xs font-bold select-none cursor-pointer ${activeCommentTexts[post.id]?.trim() ? 'text-[#0095f6]' : 'text-[#0095f6]/40'}`}
+                    >
+                      Post
+                    </button>
+                  </form>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-        
-        {/* Helper drag indicator */}
-        <p className="text-center text-xs text-gray-400 mt-4 italic">
-          ← Drag or swipe horizontally to see all 12 happy patients →
-        </p>
+            
+            {/* Scroll helper */}
+            <p className="text-center text-xs text-gray-400 mt-2 italic flex items-center justify-center gap-1 select-none">
+              <span>← Swipe left or right, or double-click to ❤️ a patient →</span>
+            </p>
+          </div>
+        )}
+
+        {/* --- VIEW MODE 2: PROFILE GRID VIEW --- */}
+        {viewMode === 'grid' && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+            {posts.map((post) => (
+              <div
+                key={post.id}
+                onClick={() => setSelectedPost(post)}
+                className="group aspect-square relative rounded-xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer shadow-sm hover:shadow transition-all duration-300"
+              >
+                <img
+                  src={post.imageSrc}
+                  alt={post.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
+                {/* Hover stats overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 text-white text-sm font-bold">
+                  <div className="flex items-center gap-1.5">
+                    <Heart className="w-5 h-5 fill-current" />
+                    <span>{post.likes}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <MessageCircle className="w-5 h-5 fill-current" />
+                    <span>{post.comments.length}</span>
+                  </div>
+                </div>
+
+                {/* Quick species badge */}
+                <span className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[9px] font-bold text-brand-green shadow-sm flex items-center gap-1 uppercase">
+                  {post.species === 'dog' && '🐶'}
+                  {post.species === 'cat' && '🐱'}
+                  {post.species === 'other' && '🐰'}
+                  <span>{post.name}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* --- LIGHTBOX MODAL FOR GRID SELECTION --- */}
+      <AnimatePresence>
+        {selectedPost && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl flex flex-col md:flex-row h-auto md:h-[550px]"
+            >
+              {/* Photo Area */}
+              <div 
+                className="w-full md:w-3/5 bg-black relative flex items-center justify-center"
+                onDoubleClick={() => handleDoubleTap(selectedPost.id)}
+              >
+                <img
+                  src={selectedPost.imageSrc}
+                  alt={selectedPost.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full max-h-[350px] md:max-h-full object-contain"
+                />
+
+                {/* Double-tap animated heart overlay */}
+                <AnimatePresence>
+                  {doubleTapActive[selectedPost.id] && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1.2, opacity: 0.9 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                    >
+                      <Heart className="w-20 h-20 text-white fill-white drop-shadow-lg" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Sidebar Info & Comments */}
+              <div className="w-full md:w-2/5 flex flex-col bg-white h-full justify-between">
+                <div>
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-brand-green/20">
+                        <img
+                          src={clinicExterior}
+                          alt="barracksvet profile"
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-xs text-gray-900 leading-tight">barracksvet</span>
+                        <span className="text-[10px] text-gray-500 leading-tight">The Barracks Vet Surgery</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedPost(null)}
+                      className="text-gray-400 hover:text-gray-700 text-lg font-bold p-1 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Body Content (Caption + Comments list) */}
+                  <div className="p-4 overflow-y-auto no-scrollbar md:max-h-[340px] text-xs space-y-4">
+                    {/* Caption */}
+                    <div className="flex items-start gap-2">
+                      <div className="w-6 h-6 rounded-full overflow-hidden border border-brand-green/20 shrink-0">
+                        <img src={clinicExterior} className="w-full h-full object-cover" referrerPolicy="no-referrer" alt="" />
+                      </div>
+                      <div>
+                        <p className="leading-relaxed">
+                          <span className="font-bold text-gray-900 mr-1.5">barracksvet</span>
+                          {renderCaption(selectedPost.caption)}
+                        </p>
+                        <span className="text-[10px] text-gray-400 font-semibold block mt-1">{selectedPost.relativeTime}</span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-50 pt-3" />
+
+                    {/* Comments List */}
+                    <div className="space-y-3">
+                      {selectedPost.comments.map((comm, idx) => (
+                        <div key={idx} className="flex items-start gap-2 leading-normal">
+                          <div className="w-6 h-6 bg-[#4A5D4E]/10 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px] text-brand-green uppercase">
+                            {comm.username.slice(0, 2)}
+                          </div>
+                          <div>
+                            <p>
+                              <span className="font-bold text-gray-900 mr-1.5 flex inline-items items-center gap-1">
+                                {comm.username}
+                                {comm.verified && (
+                                  <span className="inline-block w-3 h-3 bg-blue-500 text-white rounded-full p-0.5 flex items-center justify-center shrink-0">
+                                    <span className="text-[6px] font-bold">✓</span>
+                                  </span>
+                                )}
+                              </span>
+                              <span className="text-gray-700">{comm.text}</span>
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Likes and Comment box */}
+                <div className="border-t border-gray-100 bg-gray-50/30">
+                  {/* Action icons & Like count */}
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleLike(selectedPost.id)}
+                          className="text-gray-700 hover:text-red-500 cursor-pointer transition-all"
+                        >
+                          <Heart className={`w-5 h-5 ${selectedPost.hasLiked ? 'text-red-500 fill-red-500' : ''}`} />
+                        </button>
+                        <button className="text-gray-700 hover:text-gray-900">
+                          <MessageCircle className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs font-bold text-gray-900">{selectedPost.likes} likes</p>
+                    <p className="text-[9px] text-gray-400 tracking-wider uppercase mt-1">{selectedPost.date}</p>
+                  </div>
+
+                  {/* Comment Input */}
+                  <form
+                    onSubmit={(e) => handleCommentSubmit(selectedPost.id, e)}
+                    className="border-t border-gray-100 p-3 flex items-center gap-2"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      value={activeCommentTexts[selectedPost.id] || ''}
+                      onChange={(e) => setActiveCommentTexts(prev => ({ ...prev, [selectedPost.id]: e.target.value }))}
+                      className="text-xs flex-1 border-none focus:outline-none bg-transparent placeholder-gray-400 text-gray-800"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!activeCommentTexts[selectedPost.id]?.trim()}
+                      className={`text-xs font-bold cursor-pointer ${activeCommentTexts[selectedPost.id]?.trim() ? 'text-[#0095f6]' : 'text-[#0095f6]/40'}`}
+                    >
+                      Post
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
